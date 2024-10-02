@@ -7,7 +7,6 @@ from django.shortcuts import render, get_object_or_404
 from .models import CustomUser
 from django.shortcuts import render, redirect
 
-
 def login_view(request):
     if request.method == 'POST':
         form = LoginForm(request.POST)
@@ -17,12 +16,9 @@ def login_view(request):
             try:
                 user = CustomUser.objects.get(login=login, password=password)
                 if user.status:
-                    # Сохранение данных пользователя в сессию
-                    request.session['user_id'] = user.id
-                    request.session['user_name'] = user.login
-
-                    # Генерация уникальной ссылки (фиксированный URL)
-                    url = f"http://127.0.0.1/welcome"  # Фиксированный URL
+                    # Генерация уникальной ссылки с ID пользователя
+                    user_id = user.id
+                    url = f"http://127.0.0.1/welcome/{user_id}/"  # Изменяем URL
 
                     # Генерация QR-кода
                     qr = qrcode.QRCode(
@@ -52,7 +48,6 @@ def login_view(request):
         form = LoginForm()
     return render(request, 'login.html', {'form': form})
 
-
 def qr_auth_view(request, user_id):
     try:
         user = CustomUser.objects.get(id=user_id)
@@ -63,14 +58,14 @@ def qr_auth_view(request, user_id):
     except CustomUser.DoesNotExist:
         return HttpResponse('Error: User does not exist.')
 
-def welcome_view(request):
-    # Проверка, есть ли данные пользователя в сессии
-    if 'user_name' in request.session:
-        user_name = request.session['user_name']
-        return render(request, 'templates/authorizxation.html', {'userName': user_name})
-    else:
-        # Если данных в сессии нет, перенаправляем на страницу логина
-        return redirect('login')
+
+def welcome_view(request, user_id):
+    # Получаем пользователя по ID
+    user = get_object_or_404(CustomUser, id=user_id)
+
+    # Отображаем страницу с приветствием
+    return render(request, 'templates/authorizxation.html', {'userName': user.login})
+
 
 def logout_view(request):
     # Очистка сессии
