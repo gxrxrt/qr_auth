@@ -81,6 +81,7 @@ DATABASES = {
     }
 }
 
+#AUTH_USER_MODEL = 'authorization.CustomUser'
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -114,7 +115,10 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+CSRF_TRUSTED_ORIGINS = ['http://127.0.0.1:80/']
+LOGIN_REDIRECT_URL = '/success'
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # Default option
